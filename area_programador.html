@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Controle</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            border-radius: 15px;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-block {
+            margin-bottom: 15px;
+        }
+
+        .last-number {
+            font-size: 2em;
+            color: red;
+            margin-top: 20px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            width: 100%;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            color: white;
+            background-color: #007bff;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* Novos estilos */
+        h2 {
+            color: #007bff;
+        }
+
+        .user-list {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+
+        .user-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .delete-button {
+            color: white;
+            background-color: #dc3545;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1 class="text-center my-4">Área do Programador</h1>
+
+        <div class="container">
+            <h2>Cadastro</h2>
+            <form id="cadastroForm">
+                <input type="text" id="nome" placeholder="Nome" required>
+                <input type="text" id="sobrenome" placeholder="Sobrenome" required>
+                <input type="text" id="setor" placeholder="Setor" required>
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="senha" placeholder="Senha" required>
+                <button type="submit">Cadastrar</button>
+            </form>
+        </div>
+
+        <div class="container">
+            <h2>Usuários</h2>
+            <table class="table" id="userTable">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Sobrenome</th>
+                        <th>Email</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="userList"></tbody>
+            </table>
+        </div>
+
+        <div id="content">
+            <button class="btn btn-secondary btn-block" id="diminuirMemorandoButton">Diminuir número de Memorando</button>
+            <button class="btn btn-secondary btn-block" id="diminuirMemorandoCircularButton">Diminuir número de Memorando circular</button>
+            <button class="btn btn-secondary btn-block" id="diminuirOficioButton">Diminuir número de Oficio</button>
+            <button class="btn btn-secondary btn-block" id="diminuirOficioCircularButton">Diminuir número de Oficio circular</button>
+            <button class="btn btn-secondary btn-block" id="diminuiratestadoButton">Diminuir número de Atestado</button>
+            <button class="btn btn-secondary btn-block" id="diminuirdeclaracaoButton">Diminuir número de declaracao</button>
+
+            <p class="lead" id="memorandoDisplay">Número do Memorando: </p>
+            <p class="lead" id="memorandoCircularDisplay">Número do Memorando circular: </p>
+            <p class="lead" id="oficioDisplay">Número do Oficio: </p>
+            <p class="lead" id="oficioCircularDisplay">Número do Oficio Circular: </p>
+            <p class="lead" id="atestadoDisplay">Número do Atestado: </p>
+            <p class="lead" id="declaracaoDisplay">Número de declaracao: </p>
+
+            <p class="lead last-number" id="lastNumberDisplay"></p>
+        </div>
+    </div>
+
+    <script>
+
+        window.onload = function () {
+            // Definindo a senha do programador
+            let senhaProgramador = 'Sme@tecnologia2024';
+
+            document.getElementById('cadastroForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                var nome = document.getElementById('nome').value;
+                var sobrenome = document.getElementById('sobrenome').value;
+                var setor = document.getElementById('setor').value;
+                var email = document.getElementById('email').value;
+                var senha = document.getElementById('senha').value;
+
+                fetch('http://.../cadastro', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ nome, sobrenome, setor, email, senha }),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('E-mail já cadastrado');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        alert(data);
+                        // Armazene o setor no localStorage
+                        localStorage.setItem('setor', setor);
+                        window.location.href = 'login.html';
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        alert(error.message);
+                        // Atualize a página
+                        location.reload();
+                    });
+            });
+
+            fetch('http://.../getUsers')
+                .then(response => response.json())
+                .then(data => {
+                    const userList = document.getElementById('userList');
+                    data.forEach(user => {
+                        const userRow = document.createElement('tr');
+
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = user.nome;
+                        userRow.appendChild(nameCell);
+
+                        const surnameCell = document.createElement('td');
+                        surnameCell.textContent = user.sobrenome;
+                        userRow.appendChild(surnameCell);
+
+                        const emailCell = document.createElement('td');
+                        emailCell.textContent = user.email;
+                        userRow.appendChild(emailCell);
+
+                        const actionCell = document.createElement('td');
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Deletar';
+                        deleteButton.classList.add('btn', 'btn-danger');
+                        deleteButton.addEventListener('click', () => {
+
+                            console.log(user); // Imprime o objeto do usuário
+                            console.log(user.id); // Imprime o ID do usuário
+
+                            fetch(`http://172.16.21.57:3000/deleteUser/${user.email}`, {
+                                method: 'DELETE'
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    alert(data.message);
+                                    userRow.remove();
+                                })
+                                .catch((error) => {
+                                    console.error('Erro:', error);
+                                });
+                        });
+                        actionCell.appendChild(deleteButton);
+                        userRow.appendChild(actionCell);
+
+                        userList.appendChild(userRow);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+
+
+        //Diminuir
+
+        document.getElementById('diminuirMemorandoButton').addEventListener('click', () => {
+            fetch('http://.../diminuirMemorando', {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('memorandoDisplay').textContent = `Número do Memorando: ${data.memorando}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+        });
+
+        document.getElementById('diminuirMemorandoCircularButton').addEventListener('click', () => {
+            fetch('http://.../diminuirMemorandoCircular', {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('memorandoCircularDisplay').textContent = `Número do Memorando Circular: ${data.memorandoCircular}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+        });
+
+        document.getElementById('diminuirOficioButton').addEventListener('click', () => {
+            fetch('http://.../diminuirOficio', {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('oficioDisplay').textContent = `Número do Oficio: ${data.oficio}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+        });
+
+        document.getElementById('diminuirOficioCircularButton').addEventListener('click', () => {
+            fetch('http://.../diminuirOficioCircular', {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('oficioCircularDisplay').textContent = `Número do Oficio Circular: ${data.oficioCircular}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+        });
+
+        document.getElementById('diminuiratestadoButton').addEventListener('click', () => {
+            fetch('http://.../diminuiratestado', {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('atestadoDisplay').textContent = `Número do atestado: ${data.atestado}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+        });
+
+        document.getElementById('diminuirdeclaracaoButton').addEventListener('click', () => {
+            fetch('http://.../diminuirdeclaracao', {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('declaracaoDisplay').textContent = `Número de declaracao: ${data.declaracao}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+        });
+    }
+    </script>
+</body>
+
+</html>

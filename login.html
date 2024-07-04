@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Controle</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #dfe5f1;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color:  #ffffff;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2234cf;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            background-color: #2234cf;
+            border: none;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #000000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="email" id="loginEmail" placeholder="Email" required>
+            <input type="password" id="loginSenha" placeholder="Senha" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <script>
+
+        let nomeUsuario;
+        let sobrenomeUsuario;
+
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const senha = document.getElementById('loginSenha').value;
+
+            fetch('http://.../login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, senha }),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Email ou senha inválidos');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.message === 'Login bem-sucedido') {
+                        // Armazene o email, nome e sobrenome do usuário no localStorage
+                        localStorage.setItem('email', email);
+                        localStorage.setItem('nome', data.nome);
+                        localStorage.setItem('sobrenome', data.sobrenome);
+                        window.open('principal.html', '_blank');
+                    } else {
+                        alert('Email ou senha inválidos');
+                    }
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+        });
+
+    </script>
+</body>
+
+</html>

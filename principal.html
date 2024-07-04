@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sistema de Controle</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+
+        .ultimosDoc {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #dados {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        #dados h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #ced4da;
+            padding-bottom: 10px;
+        }
+
+        .btn-block {
+            margin-bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #c2d5e7;
+            border: none;
+            color: rgb(0, 0, 0);
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+        }
+
+        .btn-block:hover {
+            background-color: #2234cf;
+            color: white;
+        }
+
+        .btn-block button {
+            margin-bottom: 0;
+            display: inline-block;
+            justify-content: center;
+            align-items: center;
+            background-color: #2f3966;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+
+        .btn-block button:hover {
+            background-color: #555555;
+            color: white;
+        }
+
+        .btn-block button:active {
+            background-color: #3e8e41;
+
+            transform: translateY(4px);
+        }
+
+        h1 {
+            color: #2234cf;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">Sistema de Controle de Documentos</h1>
+
+        <div id="content">
+            <div class="btn btn-primary btn-block">
+                <button id="memorandoButton">Adquirir número de memorando</button>
+                <p class="lead" id="memorandoDisplay">Número do Memorando: </p>
+                <p id="memorandoUser"></p> 
+            </div>
+
+            <div class="btn btn-primary btn-block">
+                <button id="memorandoCircularButton">Adquirir número de Memorando circular</button>
+                <p class="lead" id="memorandoCircularDisplay">Número do Memorando circular: </p>
+                <p id="memorandoCircularUser"></p> 
+            </div>
+
+            <div class="btn btn-primary btn-block">
+                <button id="oficioButton">Adquirir número de Oficio</button>
+                <p class="lead" id="oficioDisplay">Número do Oficio: </p>
+                <p id="oficioUser"></p>
+            </div>
+
+            <div class="btn btn-primary btn-block">
+                <button id="oficioCircularButton">Adquirir número de Oficio circular</button>
+                <p class="lead" id="oficioCircularDisplay">Número do Oficio Circular: </p>
+                <p id="oficioCircularUser"></p> 
+            </div>
+
+            <div class="btn btn-primary btn-block">
+                <button id="atestadoButton">Adquirir número de Atestado</button>
+                <p class="lead" id="atestadoDisplay">Número do Atestado: </p>
+                <p id="atestadoUser"></p> 
+            </div>
+
+            <div class="btn btn-primary btn-block">
+                <button id="declaracaoButton">Adquirir número de Declaração</button>
+                <p class="lead" id="declaracaoDisplay">Número de Declaração: </p>
+                <p id="declaracaoUser"></p> 
+            </div>
+
+            <div id="dados" class="dadosCentro">
+                <h3 class="ultimosDoc">Últimos documentos adquiridos</h3>
+                <br>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        // Função para recarregar a página
+        function reloadPage() {
+            location.reload();
+        }
+
+        // Define o intervalo de tempo em milissegundos (1 minuto = 60000 milissegundos)
+        const intervaloRecarregarPagina = 60000;
+        setInterval(reloadPage, intervaloRecarregarPagina);
+
+        window.onload = function () {
+
+            const email = localStorage.getItem('email');
+
+            // Memorando
+            fetch('http://.../getMemorando')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('memorandoDisplay').textContent = `Número do Memorando: ${data.memorando}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+
+            document.getElementById('memorandoButton').addEventListener('click', () => {
+                const email = localStorage.getItem('email');
+
+                fetch('http://.../adquirirMemorando', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('memorandoDisplay').textContent = `Número do Memorando: ${data.memorando}`;
+                        const nome = localStorage.getItem('nome');
+                        const sobrenome = localStorage.getItem('sobrenome');
+                        const setor = localStorage.getItem('setor');
+                        const documentoTipo = 'memorando';
+                        const documentoNumero = data.memorando;
+
+                        fetch('http://.../storeDocumentoUsuario', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email, nome, sobrenome, setor, documentoTipo, documentoNumero })
+                        })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log('Documento armazenado com sucesso:', result);
+                            })
+                            .catch(error => {
+                                console.error('Erro ao armazenar documento:', error);
+                            });
+
+                        alert(`Número do Memorando Adquirido: ${data.memorando}`);
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.error('Erro:', error);
+                    });
+            });
+
+            // Memorando Circular
+            fetch('http://.../getMemorandoCircular')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('memorandoCircularDisplay').textContent = `Número do Memorando Circular: ${data.memorandoCircular}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+
+            document.getElementById('memorandoCircularButton').addEventListener('click', () => {
+                const email = localStorage.getItem('email');
+                fetch('http://.../adquirirMemorandoCircular', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('memorandoCircularDisplay').textContent = `Número do Memorando Circular: ${data.memorandoCircular}`;
+                        const nome = localStorage.getItem('nome');
+                        const sobrenome = localStorage.getItem('sobrenome');
+                        const setor = localStorage.getItem('setor');
+                        const documentoTipo = 'memorando circular';
+                        const documentoNumero = data.memorandoCircular;
+
+                        fetch('http://.../storeDocumentoUsuario', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email, nome, sobrenome, setor, documentoTipo, documentoNumero })
+                        })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log('Documento armazenado com sucesso:', result);
+                            })
+                            .catch(error => {
+                                console.error('Erro ao armazenar documento:', error);
+                            });
+
+                        alert(`Número do Memorando Circular Adquirido: ${data.memorandoCircular}`);
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.error('Erro:', error);
+                    });
+            });
+
+            // Ofício
+            fetch('http://.../getOficio')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('oficioDisplay').textContent = `Número de oficio: ${data.oficio}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+
+            document.getElementById('oficioButton').addEventListener('click', () => {
+                const email = localStorage.getItem('email');
+
+                fetch('http://.../adquirirOficio', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('oficioDisplay').textContent = `Número do Ofício: ${data.oficio}`;
+                        const nome = localStorage.getItem('nome');
+                        const sobrenome = localStorage.getItem('sobrenome');
+                        const setor = localStorage.getItem('setor');
+                        const documentoTipo = 'oficio';
+                        const documentoNumero = data.oficio;
+
+                        fetch('http://.../storeDocumentoUsuario', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email, nome, sobrenome, setor, documentoTipo, documentoNumero })
+                        })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log('Documento armazenado com sucesso:', result);
+                            })
+                            .catch(error => {
+                                console.error('Erro ao armazenar documento:', error);
+                            });
+
+                        alert(`Número do Ofício Adquirido: ${data.oficio}`);
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.error('Erro:', error);
+                    });
+            });
+
+            // Ofício Circular
+            fetch('http://.../getOficioCircular')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('oficioCircularDisplay').textContent = `Número de Oficio Circular: ${data.oficioCircular}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+
+            document.getElementById('oficioCircularButton').addEventListener('click', () => {
+                const email = localStorage.getItem('email');
+
+                fetch('http://.../adquirirOficioCircular', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('oficioCircularDisplay').textContent = `Número do Ofício Circular: ${data.oficioCircular}`;
+                        const nome = localStorage.getItem('nome');
+                        const sobrenome = localStorage.getItem('sobrenome');
+                        const setor = localStorage.getItem('setor');
+                        const documentoTipo = 'oficio circular';
+                        const documentoNumero = data.oficioCircular;
+
+                        fetch('http://.../storeDocumentoUsuario', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email, nome, sobrenome, setor, documentoTipo, documentoNumero })
+                        })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log('Documento armazenado com sucesso:', result);
+                            })
+                            .catch(error => {
+                                console.error('Erro ao armazenar documento:', error);
+                            });
+
+                        alert(`Número do Ofício Circular Adquirido: ${data.oficioCircular}`);
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.error('Erro:', error);
+                    });
+            });
+
+            // atestado
+            fetch('http://.../getAtestado')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('atestadoDisplay').textContent = `Número de atestado: ${data.atestado}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+
+            document.getElementById('atestadoButton').addEventListener('click', () => {
+                const email = localStorage.getItem('email');
+
+                fetch('http://.../adquirirAtestado', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('atestadoDisplay').textContent = `Número de Atestado ${data.atestado}`;
+                        const nome = localStorage.getItem('nome');
+                        const sobrenome = localStorage.getItem('sobrenome');
+                        const setor = localStorage.getItem('setor');
+                        const documentoTipo = 'atestado';
+                        const documentoNumero = data.atestado;
+
+                        fetch('http://.../storeDocumentoUsuario', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email, nome, sobrenome, setor, documentoTipo, documentoNumero })
+                        })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log('Documento armazenado com sucesso:', result);
+                            })
+                            .catch(error => {
+                                console.error('Erro ao armazenar documento:', error);
+                            });
+
+                        alert(`Número de Atestado Adquirido: ${data.atestado}`);
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.error('Erro:', error);
+                    });
+            });
+
+            //declaracao
+            fetch('http://.../getdeclaracao')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('declaracaoDisplay').textContent = `Número de Declaração: ${data.declaracao}`;
+                })
+                .catch((error) => {
+                    console.error('Erro:', error);
+                });
+
+            document.getElementById('declaracaoButton').addEventListener('click', () => {
+                const email = localStorage.getItem('email');
+
+                fetch('http://.../adquirirdeclaracao', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('declaracaoDisplay').textContent = `Número de Declaração: ${data.declaracao}`;
+                        const nome = localStorage.getItem('nome');
+                        const sobrenome = localStorage.getItem('sobrenome');
+                        const setor = localStorage.getItem('setor');
+                        const documentoTipo = 'declaracao';
+                        const documentoNumero = data.declaracao;
+
+                        fetch('http://.../storeDocumentoUsuario', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email, nome, sobrenome, setor, documentoTipo, documentoNumero })
+                        })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log('Documento armazenado com sucesso:', result);
+                            })
+                            .catch(error => {
+                                console.error('Erro ao armazenar documento:', error);
+                            });
+
+                        alert(`Número de Declaração Adquirido: ${data.declaracao}`);
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.error('Erro:', error);
+                    });
+            });
+
+            fetch('http://.../usuarios')
+                .then(response => response.json())
+                .then(data => {
+                    const dadosDiv = document.getElementById('dados');
+                    data.forEach(usuario => {
+                        dadosDiv.innerHTML += `<p><strong>Email: </strong> ${usuario.usuario_email}  <strong>Tipo de Documento:  </strong> ${usuario.documento_tipo}   <strong>Número de Documento:   </strong>${usuario.documento_numero}</p>`;
+                    });
+                })
+                .catch(error => console.error('Erro:', error));
+        };
+    </script>
+</body>
+
+</html>

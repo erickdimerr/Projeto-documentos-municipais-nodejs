@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sistema de Controle</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        .btn-block {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="email" id="loginEmail" placeholder="Email" required>
+            <input type="password" id="loginSenha" placeholder="Senha" required>
+            <input type="password" id="loginSenhaProgramador" placeholder="Senha Programador" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const senha = document.getElementById('loginSenha').value;
+            const senhaProgramador = document.getElementById('loginSenhaProgramador').value;
+
+            if (senhaProgramador === 'Sme@tecnologia2024') {
+                fetch('http://.../login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, senha }),
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            window.open('area_programador.html', '_blank');
+                        } else {
+                            alert('Email ou senha inválidos');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                    });
+                };
+            });
+    </script>
+</body>
+
+</html>
